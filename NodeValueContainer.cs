@@ -10,7 +10,7 @@ public class NodeValueContainer : MonoBehaviour
     void Start()
     {
         // Debug.Log("Initializing...");
-        // InitializeNodeValues();
+        InitializeNodeValues();
     }
 
     void InitializeNodeValues()
@@ -23,28 +23,41 @@ public class NodeValueContainer : MonoBehaviour
                 nodeValues.Add(node, node.GetComponent<NodeGenerator>().nodeValue);
                 // Debug.Log(node + " : " + node.GetComponent<NodeGenerator>().nodeValue);
             }
+            else
+            {
+                nodeValues.Add(node, 0);
+            }
         }
     }
 
-    public void RemoveFromNodeValues(Transform obj)
+    public void SetNodeValueToZero(Transform obj)
     {
-        nodeValues.Remove(obj);
+        if (nodeValues.ContainsKey(obj.parent))
+        {
+            nodeValues[obj.parent] = 0;
+        }
     }
 
-    public void CalculateAllNodesSum(Dictionary<Transform, Transform> nodes)
+    public void CalculateAllNodesSum(Dictionary<Transform, HashSet<Transform>> i2o)
     {
-        InitializeNodeValues();
-        foreach (KeyValuePair<Transform, Transform> node in nodes)
+        // InitializeNodeValues();
+        foreach (KeyValuePair<Transform, HashSet<Transform>> io in i2o)
         {
-            Debug.Log("Node Key: " + node.Key.parent + " | Node Value: " + node.Value.parent);
-            if (nodeValues.ContainsKey(node.Value.parent))
+            totalNodeValue = 0;
+            Debug.Log("--------------- Key: " + io.Key.parent);
+            foreach (Transform t in io.Value)
             {
-                nodeValues[node.Value.parent] += nodeValues[node.Key.parent];
+                totalNodeValue += nodeValues[t.parent];
             }
-            else
-            {
-                nodeValues.Add(node.Value.parent, nodeValues[node.Key.parent]);
-            }
+
+            // if (nodeValues.ContainsKey(io.Key.parent))
+            // {
+            nodeValues[io.Key.parent] = totalNodeValue;
+            // }
+            // else
+            // {
+            //     nodeValues.Add(io.Key.parent, totalNodeValue);
+            // }
         }
 
         foreach (KeyValuePair<Transform, int> val in nodeValues)

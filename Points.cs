@@ -15,8 +15,8 @@ public class Points : MonoBehaviour
     private LineRenderer lineRenderer;
 
     private static List<Transform> selectedObj = new List<Transform>();
-    private static Dictionary<Transform, Transform> connected = new Dictionary<Transform, Transform>();
-    private static Dictionary<Transform, List<Transform>> connectedDict = new Dictionary<Transform, List<Transform>>();
+    private static Dictionary<Transform, Transform> output2input = new Dictionary<Transform, Transform>();
+    private static Dictionary<Transform, HashSet<Transform>> input2output = new Dictionary<Transform, HashSet<Transform>>();
     // private static Dictionary<Transform, int> nodeValues = new Dictionary<Transform, int>();
 
     void Start()
@@ -100,28 +100,14 @@ public class Points : MonoBehaviour
 
         if (transform.GetComponent<LineRenderer>())
         {
-            Transform tempObj = null;
             if (transform.GetComponent<LineRenderer>().enabled)
             {
                 // Debug.Log(transform + " already contains line renderer. Disabling...");
                 transform.GetComponent<LineRenderer>().enabled = false;
                 SetSpriteColor(gameObject, Color.white);
-
-                if (connected.ContainsKey(transform))
-                {
-                    //Check whether an output node is already connected to the current input node
-                    if (!HasMoreThanOneValue(connected, connected[transform]))
-                        SetSpriteColor(connected[transform].gameObject, Color.white);
-                    //Required to sum node values AFTER node is removed in the next step
-                    tempObj = connected[transform];
-                }
-                connected.Remove(transform);
-                if (tempObj)
-                {
-                    //Remove value of node from NodeValues dictionary
-                    nodeValueContainer.RemoveFromNodeValues(tempObj);
-                    nodeValueContainer.CalculateAllNodesSum(connected);
-                }
+                nodeValueContainer.SetNodeValueToZero(transform);
+                RemoveObject(transform);
+                nodeValueContainer.CalculateAllNodesSum(input2output);
                 selectedObj.Clear();
                 return;
             }
@@ -162,22 +148,34 @@ public class Points : MonoBehaviour
             {
                 lineRenderer.SetPosition(0, selectedObj[0].position);
                 lineRenderer.SetPosition(1, selectedObj[1].position);
-                if (connectedDict.ContainsKey(selectedObj[1]))
+                if (input2output.ContainsKey(selectedObj[1]))
                 {
-                    connectedDict[selectedObj[1]].Add(selectedObj[0]);
+                    input2output[selectedObj[1]].Add(selectedObj[0]);
+                    output2input[selectedObj[0]] = selectedObj[1];
                 }
                 else
                 {
-                    List<Transform> connectedList = new List<Transform>();
-                    connectedList.Add(selectedObj[0]);
-                    connectedDict.Add(selectedObj[1], connectedList);
+                    HashSet<Transform> connectedSet = new HashSet<Transform>();
+                    connectedSet.Add(selectedObj[0]);
+                    input2output.Add(selectedObj[1], connectedSet);
+                    output2input.Add(selectedObj[0], selectedObj[1]);
                 }
                 SetSpriteColor(selectedObj[0].gameObject, Color.blue);
                 SetSpriteColor(selectedObj[1].gameObject, Color.blue);
                 selectedObj.Clear();
             }
+            nodeValueContainer.CalculateAllNodesSum(input2output);
         }
-        nodeValueContainer.CalculateAllNodesSum(connected);
+    }
+
+    public void RemoveObject(Transform obj)
+    {
+        if (output2input.ContainsKey(obj))
+        {
+            input2output[output2input[obj]].Remove(obj);
+            output2input.Remove(obj);
+        }
+
     }
 
     void SetSpriteColor(GameObject obj, Color color)

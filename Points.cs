@@ -15,6 +15,8 @@ public class Points : MonoBehaviour
     private LineRenderer lineRenderer;
 
     private static List<Transform> selectedObj = new List<Transform>();
+    // private static SortedDictionary<Transform, Transform> output2input = new SortedDictionary<Transform, Transform>();
+    // private static SortedDictionary<Transform, HashSet<Transform>> input2output = new SortedDictionary<Transform, HashSet<Transform>>();
     private static Dictionary<Transform, Transform> output2input = new Dictionary<Transform, Transform>();
     private static Dictionary<Transform, HashSet<Transform>> input2output = new Dictionary<Transform, HashSet<Transform>>();
     // private static Dictionary<Transform, int> nodeValues = new Dictionary<Transform, int>();
@@ -26,14 +28,6 @@ public class Points : MonoBehaviour
         {
             nodeValueContainer = nodeContainer.GetComponent<NodeValueContainer>();
         }
-        // Debug.Log("Initializing...");
-        // foreach (Transform node in nodeContainer)
-        // {
-        //     if (node.GetComponent<NodeGenerator>().nodeValue != 0)
-        //     {
-        //         nodeValues.Add(node, node.GetComponent<NodeGenerator>().nodeValue);
-        //     }
-        // }
     }
 
     Vector3 GetMousePosition()
@@ -58,22 +52,6 @@ public class Points : MonoBehaviour
         {
             Debug.Log(obj.Key + "->" + obj.Value);
         }
-    }
-
-    bool HasMoreThanOneValue(Dictionary<Transform, Transform> objects, Transform valTransform)
-    {
-        int count = 0;
-
-        foreach (KeyValuePair<Transform, Transform> obj in objects)
-        {
-            if (obj.Value == valTransform)
-                count++;
-
-            if (count > 1)
-                return true;
-        }
-
-        return false;
     }
 
     void OnMouseDown()
@@ -105,7 +83,11 @@ public class Points : MonoBehaviour
                 // Debug.Log(transform + " already contains line renderer. Disabling...");
                 transform.GetComponent<LineRenderer>().enabled = false;
                 SetSpriteColor(gameObject, Color.white);
-                nodeValueContainer.SetNodeValueToZero(transform);
+
+                //Check if connection to an input node are less than 2
+                if (input2output[output2input[transform]].Count < 2)
+                    SetSpriteColor(output2input[transform].gameObject, Color.white);
+
                 RemoveObject(transform);
                 nodeValueContainer.CalculateAllNodesSum(input2output);
                 selectedObj.Clear();

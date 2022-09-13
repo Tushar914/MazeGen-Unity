@@ -4,7 +4,6 @@ using UnityEngine;
 public class NodeValueContainer : MonoBehaviour
 {
     private int totalNodeValue = 0;
-
     private static Dictionary<Transform, int> nodeValues = new Dictionary<Transform, int>();
     // Start is called before the first frame update
     void Start()
@@ -44,20 +43,21 @@ public class NodeValueContainer : MonoBehaviour
         foreach (KeyValuePair<Transform, HashSet<Transform>> io in i2o)
         {
             totalNodeValue = 0;
-            Debug.Log("--------------- Key: " + io.Key.parent);
+            // Debug.Log("-------------------- KEYS START -----------------------");
+            // Debug.Log(io.Key.parent);
+            // Debug.Log("--------------------- KEYS END ------------------------");
+
+            // Debug.Log("-------------------- VALUES START ---------------------");
             foreach (Transform t in io.Value)
             {
+                // Debug.Log(t.parent);
                 totalNodeValue += nodeValues[t.parent];
             }
-
-            // if (nodeValues.ContainsKey(io.Key.parent))
-            // {
+            // Debug.Log("--------------------- VALUES END ----------------------");
             nodeValues[io.Key.parent] = totalNodeValue;
-            // }
-            // else
-            // {
-            //     nodeValues.Add(io.Key.parent, totalNodeValue);
-            // }
+            // Debug.Log("-------------------- TOTAL START ----------------------");
+            // Debug.Log(totalNodeValue);
+            // Debug.Log("--------------------- TOTAL END -----------------------");
         }
 
         foreach (KeyValuePair<Transform, int> val in nodeValues)

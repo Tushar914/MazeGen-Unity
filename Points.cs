@@ -1,6 +1,9 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
+
 
 public class Points : MonoBehaviour
 {
@@ -85,10 +88,10 @@ public class Points : MonoBehaviour
                 SetSpriteColor(gameObject, Color.white);
 
                 //Check if connection to an input node are less than 2
-                if (input2output[output2input[transform]].Count < 2)
-                    SetSpriteColor(output2input[transform].gameObject, Color.white);
+                if (input2output[output2input[transform.parent]].Count < 2)
+                    SetSpriteColor(output2input[transform.parent].GetChild(0).gameObject, Color.white);
 
-                RemoveObject(transform);
+                RemoveObject(transform.parent);
                 nodeValueContainer.CalculateAllNodesSum(input2output);
                 selectedObj.Clear();
                 return;
@@ -130,17 +133,17 @@ public class Points : MonoBehaviour
             {
                 lineRenderer.SetPosition(0, selectedObj[0].position);
                 lineRenderer.SetPosition(1, selectedObj[1].position);
-                if (input2output.ContainsKey(selectedObj[1]))
+                if (input2output.ContainsKey(selectedObj[1].parent))
                 {
-                    input2output[selectedObj[1]].Add(selectedObj[0]);
-                    output2input[selectedObj[0]] = selectedObj[1];
+                    input2output[selectedObj[1].parent].Add(selectedObj[0].parent);
+                    output2input[selectedObj[0].parent] = selectedObj[1].parent;
                 }
                 else
                 {
                     HashSet<Transform> connectedSet = new HashSet<Transform>();
-                    connectedSet.Add(selectedObj[0]);
-                    input2output.Add(selectedObj[1], connectedSet);
-                    output2input.Add(selectedObj[0], selectedObj[1]);
+                    connectedSet.Add(selectedObj[0].parent);
+                    input2output.Add(selectedObj[1].parent, connectedSet);
+                    output2input.Add(selectedObj[0].parent, selectedObj[1].parent);
                 }
                 SetSpriteColor(selectedObj[0].gameObject, Color.blue);
                 SetSpriteColor(selectedObj[1].gameObject, Color.blue);
@@ -157,7 +160,6 @@ public class Points : MonoBehaviour
             input2output[output2input[obj]].Remove(obj);
             output2input.Remove(obj);
         }
-
     }
 
     void SetSpriteColor(GameObject obj, Color color)

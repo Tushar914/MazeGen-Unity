@@ -37,27 +37,51 @@ public class NodeValueContainer : MonoBehaviour
         }
     }
 
+    // public void CalculateAllNodesSum(Dictionary<Transform, HashSet<Transform>> i2o)
+    // {
+    //     // InitializeNodeValues();
+    //     foreach (KeyValuePair<Transform, HashSet<Transform>> io in i2o)
+    //     {
+    //         totalNodeValue = 0;
+    //         // Debug.Log("-------------------- KEYS START -----------------------");
+    //         Debug.Log("Key: " + io.Key.parent);
+    //         // Debug.Log("--------------------- KEYS END ------------------------");
+
+    //         // Debug.Log("-------------------- VALUES START ---------------------");
+    //         foreach (Transform t in io.Value)
+    //         {
+    //             // Debug.Log(t.parent);
+    //             totalNodeValue += nodeValues[t.parent];
+    //         }
+    //         // Debug.Log("--------------------- VALUES END ----------------------");
+    //         // nodeValues[io.Key.parent] = totalNodeValue;
+    //         // Debug.Log("-------------------- TOTAL START ----------------------");
+    //         // Debug.Log(totalNodeValue);
+    //         // Debug.Log("--------------------- TOTAL END -----------------------");
+    //     }
+
+    //     foreach (KeyValuePair<Transform, int> val in nodeValues)
+    //     {
+    //         Debug.Log(val.Key + " : " + val.Value);
+    //     }
+    // }
+
     public void CalculateAllNodesSum(Dictionary<Transform, HashSet<Transform>> i2o)
     {
         // InitializeNodeValues();
-        foreach (KeyValuePair<Transform, HashSet<Transform>> io in i2o)
+        foreach (Transform node in transform)
         {
             totalNodeValue = 0;
-            // Debug.Log("-------------------- KEYS START -----------------------");
-            // Debug.Log(io.Key.parent);
-            // Debug.Log("--------------------- KEYS END ------------------------");
 
-            // Debug.Log("-------------------- VALUES START ---------------------");
-            foreach (Transform t in io.Value)
+            if (i2o.ContainsKey(node))
             {
-                // Debug.Log(t.parent);
-                totalNodeValue += nodeValues[t.parent];
+                foreach (Transform t in i2o[node])
+                {
+                    totalNodeValue += nodeValues[t];
+                }
+                nodeValues[node] = totalNodeValue;
             }
-            // Debug.Log("--------------------- VALUES END ----------------------");
-            nodeValues[io.Key.parent] = totalNodeValue;
-            // Debug.Log("-------------------- TOTAL START ----------------------");
-            // Debug.Log(totalNodeValue);
-            // Debug.Log("--------------------- TOTAL END -----------------------");
+
         }
 
         foreach (KeyValuePair<Transform, int> val in nodeValues)

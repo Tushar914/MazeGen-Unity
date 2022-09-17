@@ -20,6 +20,11 @@ public class Points : MonoBehaviour
     private static Dictionary<Transform, Transform> output2input = new Dictionary<Transform, Transform>();
     private static Dictionary<Transform, HashSet<Transform>> input2output = new Dictionary<Transform, HashSet<Transform>>();
 
+    //NodeContainer_1
+    //  -> Node1
+    //  -> Node2
+    //  ->...........
+    //  -> Node N
     void Start()
     {
         nodeContainer = GameObject.Find("NodeContainer_1").transform;

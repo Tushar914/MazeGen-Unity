@@ -1,2 +1,2 @@
 # NodesCreator
-Create node system in Unity
+Node system blueprint made with Unity.

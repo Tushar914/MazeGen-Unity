@@ -1,13 +1,11 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 
 public class Points : MonoBehaviour
 {
-    [SerializeField] private GameObject pointerPrefab;
+    //Provide texture for line
     [SerializeField] private Material lineMaterial;
 
     private Transform nodeContainer;
@@ -18,11 +16,9 @@ public class Points : MonoBehaviour
     private LineRenderer lineRenderer;
 
     private static List<Transform> selectedObj = new List<Transform>();
-    // private static SortedDictionary<Transform, Transform> output2input = new SortedDictionary<Transform, Transform>();
-    // private static SortedDictionary<Transform, HashSet<Transform>> input2output = new SortedDictionary<Transform, HashSet<Transform>>();
+
     private static Dictionary<Transform, Transform> output2input = new Dictionary<Transform, Transform>();
     private static Dictionary<Transform, HashSet<Transform>> input2output = new Dictionary<Transform, HashSet<Transform>>();
-    // private static Dictionary<Transform, int> nodeValues = new Dictionary<Transform, int>();
 
     void Start()
     {
@@ -41,22 +37,6 @@ public class Points : MonoBehaviour
         return mousePosition;
     }
 
-    void PrintAllObjects(List<Transform> objects)
-    {
-        foreach (Transform obj in objects)
-        {
-            Debug.Log(obj);
-        }
-    }
-
-    void PrintAllConnectedObjects(Dictionary<Transform, Transform> objects)
-    {
-        foreach (KeyValuePair<Transform, Transform> obj in objects)
-        {
-            Debug.Log(obj.Key + "->" + obj.Value);
-        }
-    }
-
     void OnMouseDown()
     {
         //Prevent connecting an input node to an output node
@@ -67,6 +47,7 @@ public class Points : MonoBehaviour
         if (selectedObj.Count == 1 && tag == "DotsOutput")
         {
             SetSpriteColor(selectedObj[0].gameObject, Color.white);
+            transform.GetComponent<LineRenderer>().enabled = false;
             selectedObj.Clear();
             return;
         }
@@ -87,11 +68,11 @@ public class Points : MonoBehaviour
                 transform.GetComponent<LineRenderer>().enabled = false;
                 SetSpriteColor(gameObject, Color.white);
 
-                //Check if connection to an input node are less than 2
+                //Check if connection to an input node are less than 2, if yes, then set dot to white
                 if (input2output[output2input[transform.parent]].Count < 2)
                     SetSpriteColor(output2input[transform.parent].GetChild(0).gameObject, Color.white);
 
-                RemoveObject(transform.parent);
+                RemoveNode(transform.parent);
                 nodeValueContainer.CalculateAllNodesSum(input2output);
                 selectedObj.Clear();
                 return;
@@ -153,15 +134,19 @@ public class Points : MonoBehaviour
         }
     }
 
-    public void RemoveObject(Transform obj)
+    public void RemoveNode(Transform node)
     {
-        if (output2input.ContainsKey(obj))
+        if (output2input.ContainsKey(node))
         {
-            input2output[output2input[obj]].Remove(obj);
-            output2input.Remove(obj);
+            input2output[output2input[node]].Remove(node);
+            output2input.Remove(node);
         }
     }
 
+    //Set color of the dot connecting nodes
+    //Green - Connecting
+    //Blue - Connected
+    //White - Not Connected
     void SetSpriteColor(GameObject obj, Color color)
     {
         obj.GetComponent<Image>().color = color;

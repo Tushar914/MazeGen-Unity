@@ -5,10 +5,10 @@ public class NodeValueContainer : MonoBehaviour
 {
     private int totalNodeValue = 0;
     private static Dictionary<Transform, int> nodeValues = new Dictionary<Transform, int>();
+
     // Start is called before the first frame update
     void Start()
     {
-        // Debug.Log("Initializing...");
         InitializeNodeValues();
     }
 
@@ -20,7 +20,6 @@ public class NodeValueContainer : MonoBehaviour
             if (node.GetComponent<NodeGenerator>().nodeValue != 0)
             {
                 nodeValues.Add(node, node.GetComponent<NodeGenerator>().nodeValue);
-                // Debug.Log(node + " : " + node.GetComponent<NodeGenerator>().nodeValue);
             }
             else
             {
@@ -37,38 +36,9 @@ public class NodeValueContainer : MonoBehaviour
         }
     }
 
-    // public void CalculateAllNodesSum(Dictionary<Transform, HashSet<Transform>> i2o)
-    // {
-    //     // InitializeNodeValues();
-    //     foreach (KeyValuePair<Transform, HashSet<Transform>> io in i2o)
-    //     {
-    //         totalNodeValue = 0;
-    //         // Debug.Log("-------------------- KEYS START -----------------------");
-    //         Debug.Log("Key: " + io.Key.parent);
-    //         // Debug.Log("--------------------- KEYS END ------------------------");
-
-    //         // Debug.Log("-------------------- VALUES START ---------------------");
-    //         foreach (Transform t in io.Value)
-    //         {
-    //             // Debug.Log(t.parent);
-    //             totalNodeValue += nodeValues[t.parent];
-    //         }
-    //         // Debug.Log("--------------------- VALUES END ----------------------");
-    //         // nodeValues[io.Key.parent] = totalNodeValue;
-    //         // Debug.Log("-------------------- TOTAL START ----------------------");
-    //         // Debug.Log(totalNodeValue);
-    //         // Debug.Log("--------------------- TOTAL END -----------------------");
-    //     }
-
-    //     foreach (KeyValuePair<Transform, int> val in nodeValues)
-    //     {
-    //         Debug.Log(val.Key + " : " + val.Value);
-    //     }
-    // }
-
+    //Calculates sum of all nodes by adding values of all output connected nodes
     public void CalculateAllNodesSum(Dictionary<Transform, HashSet<Transform>> i2o)
     {
-        // InitializeNodeValues();
         foreach (Transform node in transform)
         {
             totalNodeValue = 0;

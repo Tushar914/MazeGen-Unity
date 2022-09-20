@@ -3,8 +3,11 @@ using UnityEngine;
 
 public class NodeValueContainer : MonoBehaviour
 {
-    private int totalNodeValue = 0;
-    private static Dictionary<Transform, int> nodeValues = new Dictionary<Transform, int>();
+    [SerializeField] private List<Transform> inputList = new List<Transform>();
+    [SerializeField] private Transform outputImage;
+
+    private string totalNodeValue = "";
+    private static Dictionary<Transform, string> nodeValues = new Dictionary<Transform, string>();
 
     // Start is called before the first frame update
     void Start()
@@ -17,32 +20,31 @@ public class NodeValueContainer : MonoBehaviour
         nodeValues.Clear();
         foreach (Transform node in transform)
         {
-            if (node.GetComponent<NodeGenerator>().nodeValue != 0)
+            if (node.GetComponent<NodeGenerator>().nodeValue != "")
             {
                 nodeValues.Add(node, node.GetComponent<NodeGenerator>().nodeValue);
             }
             else
             {
-                nodeValues.Add(node, 0);
+                nodeValues.Add(node, "");
             }
         }
     }
 
-    public void SetNodeValueToZero(Transform obj)
+    public void SetNodeValueToNull(Transform obj)
     {
         if (nodeValues.ContainsKey(obj.parent))
         {
-            nodeValues[obj.parent] = 0;
+            nodeValues[obj.parent] = "";
         }
     }
 
     //Calculates sum of all nodes by adding values of all output connected nodes
     public void CalculateAllNodesSum(Dictionary<Transform, HashSet<Transform>> i2o)
     {
+        totalNodeValue = "";
         foreach (Transform node in transform)
         {
-            totalNodeValue = 0;
-
             if (i2o.ContainsKey(node))
             {
                 foreach (Transform t in i2o[node])
@@ -51,12 +53,38 @@ public class NodeValueContainer : MonoBehaviour
                 }
                 nodeValues[node] = totalNodeValue;
             }
-
         }
 
-        foreach (KeyValuePair<Transform, int> val in nodeValues)
+        // foreach (KeyValuePair<Transform, string> val in nodeValues)
+        // {
+        //     Debug.Log(val.Key + " : " + val.Value);
+        // }
+    }
+
+    public void CalculateNodeValues(Dictionary<Transform, Transform> o2i)
+    {
+        InitializeNodeValues();
+        foreach (Transform t in inputList)
         {
-            Debug.Log(val.Key + " : " + val.Value);
+            Transform tempKey = null;
+            int count = 0;
+            totalNodeValue = "";
+            if (o2i.ContainsKey(t))
+            {
+                tempKey = t;
+                while (o2i.ContainsKey(tempKey))
+                {
+                    count++;
+                    totalNodeValue += nodeValues[o2i[tempKey]];
+                    tempKey = o2i[tempKey];
+                    if (count > 12)
+                        break;
+                }
+                nodeValues[t] = totalNodeValue;
+            }
         }
+
+        Debug.Log("Input image 1: " + nodeValues[inputList[0]]);
+        Debug.Log("Input image 2: " + nodeValues[inputList[1]]);
     }
 }

@@ -78,7 +78,7 @@ public class Points : MonoBehaviour
                     SetSpriteColor(output2input[transform.parent].GetChild(0).gameObject, Color.white);
 
                 RemoveNode(transform.parent);
-                nodeValueContainer.CalculateAllNodesSum(input2output);
+                nodeValueContainer.CalculateNodeValues(output2input);
                 selectedObj.Clear();
                 return;
             }
@@ -135,7 +135,30 @@ public class Points : MonoBehaviour
                 SetSpriteColor(selectedObj[1].gameObject, Color.blue);
                 selectedObj.Clear();
             }
-            nodeValueContainer.CalculateAllNodesSum(input2output);
+            // CalculateNodeValues();
+
+            // PrintO2I();
+            nodeValueContainer.CalculateNodeValues(output2input);
+        }
+    }
+
+    void PrintI2O()
+    {
+        foreach (KeyValuePair<Transform, HashSet<Transform>> i2o in input2output)
+        {
+            Debug.Log("Key: " + i2o.Key);
+            foreach (Transform t in i2o.Value)
+            {
+                Debug.Log(" -> " + t);
+            }
+        }
+    }
+
+    void PrintO2I()
+    {
+        foreach (KeyValuePair<Transform, Transform> o2i in output2input)
+        {
+            Debug.Log("Key: " + o2i.Key + " | Value: " + o2i.Value);
         }
     }
 

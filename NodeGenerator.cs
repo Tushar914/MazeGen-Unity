@@ -4,7 +4,7 @@ public class NodeGenerator : MonoBehaviour
 {
     [SerializeField] private GameObject dotPrefab;
     [SerializeField] private Points point;
-    public int nodeValue;
+    public string nodeValue = "";
 
     private enum Points { Left, Right, Both };
     private Points oldPoint;

@@ -24,13 +24,13 @@ public class MazeGen : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        InitializeDatasets();
+        Init();
         GenerateGrid();
         PopulateNeighbours();
         StartCoroutine(GeneratePath());
     }
 
-    void InitializeDatasets()
+    void Init()
     {
         wallNum = 0;
         mazeGenFinished = false;
@@ -70,9 +70,6 @@ public class MazeGen : MonoBehaviour
 
                 cellRef.Add(new Vector2(i, j), cell.transform);
                 cellList.Add(new Vector2(i, j));
-
-                //bool edgeBool = (i == 0 || i == mazeSize.x || j == 0 || j == mazeSize.y);
-                //bool cornerBool = ((i == 0 && j == 0) || (i == 0 && j == mazeSize.y - 1) || (i == mazeSize.x - 1 && j == mazeSize.y - 1) || (i == mazeSize.x - 1 && j == 0));
 
                 wallRotation = Quaternion.Euler(0, 90, 0);
                 wallPosition = new Vector3(cellPosition.x, 4, cellPosition.z - 3.5f);
@@ -131,18 +128,6 @@ public class MazeGen : MonoBehaviour
                 }
             }
         }
-
-        // foreach (KeyValuePair<Vector2, List<Vector2>> cellKV in neighbourList)
-        // {
-        //     Debug.Log("--------------------------------------------");
-        //     Debug.Log("Cell: " + cellKV.Key);
-        //     Debug.Log("Neighbours: ");
-        //     foreach (Vector2 neighbour in cellKV.Value)
-        //     {
-        //         Debug.Log(neighbour);
-        //     }
-        //     Debug.Log("--------------------------------------------");
-        // }
     }
 
     Vector2 GetNeighbour(Vector2 cell)
@@ -159,7 +144,6 @@ public class MazeGen : MonoBehaviour
 
         if (containsN)
         {
-            // Debug.Log("Neighbour already in visited!");
             if (cellStack.Count > 0)
                 cellStack.Pop();
 
@@ -168,7 +152,6 @@ public class MazeGen : MonoBehaviour
 
         int randN = Random.Range(0, neighbourList[cell].Count);
         Vector2 neighbour = neighbourList[cell][randN];
-        // int dbg_breaker = 0;
 
         while (visitedCell.Contains(neighbour))
         {
@@ -178,7 +161,6 @@ public class MazeGen : MonoBehaviour
         }
 
         neighbourList[cell].Remove(neighbour);
-        // Debug.Log("Neighbour selected for " + cell + ": " + neighbour);
         return neighbour;
     }
 
@@ -189,12 +171,8 @@ public class MazeGen : MonoBehaviour
         cellStack.Push(nextCell);
         cellRef[nextCell].GetComponent<MeshRenderer>().material = visitedFloorMat;
 
-        // int dbg_count = 0;
         while (visitedCell.Count < (mazeSize.x * mazeSize.y))
         {
-            // Debug.Log("-----------------------------------------------------------");
-            // dbg_count++;
-
             Vector2 prevCell = nextCell;
             nextCell = GetNeighbour(nextCell);
             CalculateEdge(prevCell, nextCell);
@@ -203,7 +181,6 @@ public class MazeGen : MonoBehaviour
             {
                 visitedCell.Add(nextCell);
                 cellRef[nextCell].GetComponent<MeshRenderer>().material = visitedFloorMat;
-                // Debug.Log(nextCell + " added to Visited");
             }
 
 
@@ -211,23 +188,13 @@ public class MazeGen : MonoBehaviour
             {
                 if (cellStack.Peek() != nextCell)
                 {
-                    // Debug.Log(nextCell + " added to Stack");
                     cellStack.Push(nextCell);
                 }
             }
 
-
             yield return new WaitForSeconds(animationSpeed);
-            // Debug.Log("-----------------------------------------------------------");
         }
 
-        // Debug.Log("Total visited cells: " + visitedCell.Count);
-        // Debug.Log("Visited Cells: ");
-
-        // foreach (Vector2 vc in visitedCell)
-        // {
-        //     Debug.Log(vc);
-        // }
         Debug.Log("Total visited cells: " + visitedCell.Count);
         Debug.Log("Maze Generation Finished");
         mazeGenFinished = true;
@@ -242,12 +209,10 @@ public class MazeGen : MonoBehaviour
         {
             edgeV = ((mazeSize.x * 2) + 1) * (prevCell.x + 1) + (2 * (prevCell.y + 1));
             edgeH = edgeV - (mazeSize.x * 2);
+
             if (nextCell.x == mazeSize.x - 1)
-            {
-                Debug.Log("---------->EdgeV: " + edgeV);
                 edgeH += nextCell.y;
-                Debug.Log("---------->EdgeH: " + edgeH);
-            }
+
             DestroyWall(edgeH);
             Debug.Log("(+HOR) Edge of " + prevCell + " and " + nextCell + " is " + edgeH);
         }
@@ -256,12 +221,10 @@ public class MazeGen : MonoBehaviour
         {
             edgeV = ((mazeSize.x * 2) + 1) * (nextCell.x + 1) + (2 * (nextCell.y + 1));
             edgeH = edgeV - (mazeSize.x * 2);
+
             if (prevCell.x == mazeSize.x - 1)
-            {
-                Debug.Log("---------->EdgeV: " + edgeV);
                 edgeH += prevCell.y;
-                Debug.Log("---------->EdgeH: " + edgeH);
-            }
+
             DestroyWall(edgeH);
             Debug.Log("(-HOR) Edge of " + prevCell + " and " + nextCell + " is " + edgeH);
         }
@@ -269,11 +232,10 @@ public class MazeGen : MonoBehaviour
         else if (prevCell.x + 1 == nextCell.x)
         {
             edgeV = ((mazeSize.x * 2) + 1) * (prevCell.x + 1) + (2 * (prevCell.y + 1));
+
             if (nextCell.x == mazeSize.x - 1)
-            {
                 edgeV += nextCell.y;
-                Debug.Log("---------->EdgeV: " + edgeV);
-            }
+
             DestroyWall(edgeV);
             Debug.Log("(+VRT) Edge of " + prevCell + " and " + nextCell + " is " + edgeV);
         }
@@ -281,15 +243,13 @@ public class MazeGen : MonoBehaviour
         else if (prevCell.x - 1 == nextCell.x)
         {
             edgeV = ((mazeSize.x * 2) + 1) * (nextCell.x + 1) + (2 * (nextCell.y + 1));
+
             if (prevCell.x == mazeSize.x - 1)
-            {
                 edgeV += prevCell.y;
-                Debug.Log("---------->EdgeV: " + edgeV);
-            }
+
             DestroyWall(edgeV);
             Debug.Log("(-VRT) Edge of " + prevCell + " and " + nextCell + " is " + edgeV);
         }
-        //Exceptions
     }
 
     void DestroyWall(float edgeNum)

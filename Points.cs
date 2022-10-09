@@ -52,7 +52,7 @@ public class Points : MonoBehaviour
         if (selectedObj.Count == 1 && tag == "DotsOutput")
         {
             SetSpriteColor(selectedObj[0].gameObject, Color.white);
-            transform.GetComponent<LineRenderer>().enabled = false;
+            selectedObj[0].GetComponent<LineRenderer>().enabled = false;
             selectedObj.Clear();
             return;
         }

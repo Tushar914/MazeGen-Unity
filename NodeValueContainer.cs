@@ -5,6 +5,7 @@ public class NodeValueContainer : MonoBehaviour
 {
     [SerializeField] private List<Transform> inputList = new List<Transform>();
     [SerializeField] private Transform outputImage;
+    [SerializeField] private string actualOutput;
 
     private string totalNodeValue = "";
     private static Dictionary<Transform, string> nodeValues = new Dictionary<Transform, string>();
@@ -75,8 +76,15 @@ public class NodeValueContainer : MonoBehaviour
                 while (o2i.ContainsKey(tempKey))
                 {
                     count++;
+                    // if (o2i.ContainsKey(tempKey))
+                    // {
+                    //     if (o2i[tempKey] == outputImage)
+                    //         break;
+                    // }
+
                     totalNodeValue += nodeValues[o2i[tempKey]];
                     tempKey = o2i[tempKey];
+
                     if (count > 12)
                         break;
                 }
@@ -84,7 +92,17 @@ public class NodeValueContainer : MonoBehaviour
             }
         }
 
-        Debug.Log("Input image 1: " + nodeValues[inputList[0]]);
-        Debug.Log("Input image 2: " + nodeValues[inputList[1]]);
+        // Debug.Log("Input image 1: " + nodeValues[inputList[0]]);
+        // Debug.Log("Input image 2: " + nodeValues[inputList[1]]);
+
+        string calculatedOutput = nodeValues[inputList[0]] + nodeValues[inputList[1]];
+
+        Debug.Log("Calculated: " + calculatedOutput);
+        Debug.Log("Actual: " + actualOutput);
+
+        if (calculatedOutput == actualOutput)
+        {
+            Debug.Log("TEST PASSED");
+        }
     }
 }

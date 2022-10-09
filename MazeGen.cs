@@ -13,22 +13,46 @@ public class MazeGen : MonoBehaviour
     public Material visitedFloorMat;
 
     Dictionary<Vector2, Transform> cellRef = new Dictionary<Vector2, Transform>();
-    List<Vector2> cellList = new List<Vector2>();
     Dictionary<float, GameObject> wallList = new Dictionary<float, GameObject>();
     Dictionary<Vector2, List<Vector2>> neighbourList = new Dictionary<Vector2, List<Vector2>>();
+    List<Vector2> cellList = new List<Vector2>();
     List<Vector2> visitedCell = new List<Vector2>();
     Stack<Vector2> cellStack = new Stack<Vector2>();
 
     int wallNum = 0;
+    bool mazeGenFinished = false;
     // Start is called before the first frame update
     void Start()
     {
-        GenerateMaze();
+        InitializeDatasets();
+        GenerateGrid();
         PopulateNeighbours();
         StartCoroutine(GeneratePath());
     }
 
-    void GenerateMaze()
+    void InitializeDatasets()
+    {
+        wallNum = 0;
+        mazeGenFinished = false;
+        cellRef = new Dictionary<Vector2, Transform>();
+        wallList = new Dictionary<float, GameObject>();
+        neighbourList = new Dictionary<Vector2, List<Vector2>>();
+        cellList = new List<Vector2>();
+        visitedCell = new List<Vector2>();
+        cellStack = new Stack<Vector2>();
+
+        foreach (Transform cell in cellParent)
+        {
+            Destroy(cell.gameObject);
+        }
+
+        foreach (Transform wall in wallParent)
+        {
+            Destroy(wall.gameObject);
+        }
+    }
+
+    void GenerateGrid()
     {
         Vector3 cellPosition = Vector3.zero;
         Vector3 wallPosition = Vector3.zero;
@@ -206,38 +230,66 @@ public class MazeGen : MonoBehaviour
         // }
         Debug.Log("Total visited cells: " + visitedCell.Count);
         Debug.Log("Maze Generation Finished");
+        mazeGenFinished = true;
     }
 
     void CalculateEdge(Vector2 prevCell, Vector2 nextCell)
     {
         float edgeV = 0f;
         float edgeH = 0f;
+        //Calculate Horizontal Edge in Right Direction
         if (prevCell.y + 1 == nextCell.y)
         {
             edgeV = ((mazeSize.x * 2) + 1) * (prevCell.x + 1) + (2 * (prevCell.y + 1));
             edgeH = edgeV - (mazeSize.x * 2);
+            if (nextCell.x == mazeSize.x - 1)
+            {
+                Debug.Log("---------->EdgeV: " + edgeV);
+                edgeH += nextCell.y;
+                Debug.Log("---------->EdgeH: " + edgeH);
+            }
             DestroyWall(edgeH);
-            Debug.Log("(+) Edge of " + prevCell + " and " + nextCell + " is " + edgeH);
+            Debug.Log("(+HOR) Edge of " + prevCell + " and " + nextCell + " is " + edgeH);
         }
+        //Calculate Horizontal Edge in Left Direction
         else if (prevCell.y - 1 == nextCell.y)
         {
             edgeV = ((mazeSize.x * 2) + 1) * (nextCell.x + 1) + (2 * (nextCell.y + 1));
             edgeH = edgeV - (mazeSize.x * 2);
+            if (prevCell.x == mazeSize.x - 1)
+            {
+                Debug.Log("---------->EdgeV: " + edgeV);
+                edgeH += prevCell.y;
+                Debug.Log("---------->EdgeH: " + edgeH);
+            }
             DestroyWall(edgeH);
-            Debug.Log("(-) Edge of " + prevCell + " and " + nextCell + " is " + edgeH);
+            Debug.Log("(-HOR) Edge of " + prevCell + " and " + nextCell + " is " + edgeH);
         }
+        //Calculate Vertical Edge in Down Direction
         else if (prevCell.x + 1 == nextCell.x)
         {
             edgeV = ((mazeSize.x * 2) + 1) * (prevCell.x + 1) + (2 * (prevCell.y + 1));
+            if (nextCell.x == mazeSize.x - 1)
+            {
+                edgeV += nextCell.y;
+                Debug.Log("---------->EdgeV: " + edgeV);
+            }
             DestroyWall(edgeV);
-            Debug.Log("(+) Edge of " + prevCell + " and " + nextCell + " is " + edgeV);
+            Debug.Log("(+VRT) Edge of " + prevCell + " and " + nextCell + " is " + edgeV);
         }
+        //Calculate Vertical Edge in Up Direction
         else if (prevCell.x - 1 == nextCell.x)
         {
             edgeV = ((mazeSize.x * 2) + 1) * (nextCell.x + 1) + (2 * (nextCell.y + 1));
+            if (prevCell.x == mazeSize.x - 1)
+            {
+                edgeV += prevCell.y;
+                Debug.Log("---------->EdgeV: " + edgeV);
+            }
             DestroyWall(edgeV);
-            Debug.Log("(-) Edge of " + prevCell + " and " + nextCell + " is " + edgeV);
+            Debug.Log("(-VRT) Edge of " + prevCell + " and " + nextCell + " is " + edgeV);
         }
+        //Exceptions
     }
 
     void DestroyWall(float edgeNum)
@@ -250,6 +302,9 @@ public class MazeGen : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (Input.GetKeyDown(KeyCode.E) && mazeGenFinished)
+        {
+            Start();
+        }
     }
 }

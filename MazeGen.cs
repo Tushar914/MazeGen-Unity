@@ -26,6 +26,7 @@ public class MazeGen : MonoBehaviour
     {
         Init();
         GenerateGrid();
+        CreateEntranceAndExit();
         PopulateNeighbours();
         StartCoroutine(GeneratePath());
     }
@@ -65,6 +66,9 @@ public class MazeGen : MonoBehaviour
                 Vector3 cellScale = cellPrefab.transform.localScale;
                 cellPosition = new Vector3(i * cellScale.x, 0, j * cellScale.z);
                 GameObject cell = Instantiate(cellPrefab, cellPosition, Quaternion.identity);
+                float halfHeight = wallPrefab.transform.lossyScale.y / 2;
+                float halfWidth = wallPrefab.transform.lossyScale.z / 2;
+
                 cell.name = "Cell (" + i + ", " + j + ")";
                 cell.transform.SetParent(cellParent);
 
@@ -72,26 +76,26 @@ public class MazeGen : MonoBehaviour
                 cellList.Add(new Vector2(i, j));
 
                 wallRotation = Quaternion.Euler(0, 90, 0);
-                wallPosition = new Vector3(cellPosition.x, 4, cellPosition.z - 3.5f);
+                wallPosition = new Vector3(cellPosition.x, halfHeight, cellPosition.z - halfWidth);
 
                 InstantiateWall(wallPosition, wallRotation);
 
                 wallRotation = Quaternion.Euler(0, 0, 0);
-                wallPosition = new Vector3(cellPosition.x - 3.5f, 4, cellPosition.z);
+                wallPosition = new Vector3(cellPosition.x - halfWidth, halfHeight, cellPosition.z);
 
                 InstantiateWall(wallPosition, wallRotation);
 
                 if (i == mazeSize.x - 1)
                 {
                     wallRotation = Quaternion.Euler(0, 0, 0);
-                    wallPosition = new Vector3(cellPosition.x + 3.5f, 4, cellPosition.z);
+                    wallPosition = new Vector3(cellPosition.x + halfWidth, halfHeight, cellPosition.z);
                     InstantiateWall(wallPosition, wallRotation);
                 }
 
                 if (j == mazeSize.y - 1)
                 {
                     wallRotation = Quaternion.Euler(0, 90, 0);
-                    wallPosition = new Vector3(cellPosition.x, 4, cellPosition.z + 3.5f);
+                    wallPosition = new Vector3(cellPosition.x, halfHeight, cellPosition.z + halfWidth);
                     InstantiateWall(wallPosition, wallRotation);
                 }
             }
@@ -105,6 +109,19 @@ public class MazeGen : MonoBehaviour
         wall.name = "Wall (" + wallNum + ")";
         wall.transform.SetParent(wallParent);
         wallList.Add(wallNum, wall);
+    }
+
+    void CreateEntranceAndExit()
+    {
+        int randN = Random.Range(3, (int)mazeSize.y - 1);
+        int edgeEntrance = randN * 2;
+        Debug.Log("Entrance: " + edgeEntrance);
+        DestroyWall(edgeEntrance);
+
+        randN = Random.Range(3, (int)mazeSize.y - 1);
+        int edgeExit = ((int)mazeSize.y - 1) * ((int)mazeSize.y * 2 + 1) + (randN * 3);
+        Debug.Log("Mazesize: " + ((int)mazeSize.y * 2 + 1) + " | RandN: " + randN + " | Exit: " + edgeExit);
+        DestroyWall(edgeExit);
     }
 
     void PopulateNeighbours()
